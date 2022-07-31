@@ -1,6 +1,5 @@
 @use "./linear-interpolation" as l;
 
-/// adaptivity
 /// Builds a set of media queries, where for each of the screen width points a set of properties is applied.
 /// Any value in between these points is achieved by using linear interpolation.
 /// For the screen widths bigger than specified, the first value in properties' list is applied by default.
@@ -14,19 +13,19 @@
 ///   Possible values: none, keep-value (default), keep-interpolation
 /// @returns A set of properties and media queries to achieve certain values in certain screen widths.
 /// @example
-///   @include linear-interpolation(1440px 834px, (
-///       "font-size": $font-size-medium 19px,
-///       "line-height": 51px 34px
+///   @include interpolate(1440px 834px, (
+///       font-size: $font-size-medium 19px,
+///       line-height: 51px 34px
 ///   ));
-@mixin adaptivity($screen-widths-list, $properties-map, $outside-screen-widths: keep-value) {
+@mixin interpolate($screen-widths-list, $properties-map, $outside-screen-widths: keep-value) {
 	$outside-maximum: keep-value;
 	$outside-minimum: keep-value;
 
 	@if length($outside-screen-widths) < 1 {
-		@warn 'No values are specified for the $outside-screen-widths list. Keeping default.';
+		@warn "No values are specified for the $outside-screen-widths list. Keeping default.";
 	} @else {
 		@if length($outside-screen-widths) > 2 {
-			@warn 'No need to specifiy more than 2 values for the $outside-screen-widths list.';
+			@warn "No need to specifiy more than 2 values for the $outside-screen-widths list.";
 		}
 		$outside-maximum: nth($outside-screen-widths, 1);
 		$outside-minimum: if(length($outside-screen-widths) >= 2, nth($outside-screen-widths, 2), $outside-maximum);
