@@ -1,0 +1,89 @@
+@use "./linear-interpolation" as l;
+
+/// adaptivity
+/// Builds a set of media queries, where for each of the screen width points a set of properties is applied.
+/// Any value in between these points is achieved by using linear interpolation.
+/// For the screen widths bigger than specified, the first value in properties' list is applied by default.
+/// For the screen widths smaller than specified, the last value in properties' list is applied by default.
+/// This behaviour can be modified by explicitly defining the third argument.
+/// @param $screen-widths-list - A list of screen width points
+/// @param $properties-map - A map of properties' names and lists of values to achieve at certain screen width points
+/// @param $outside-screen-widths - A list of values defining what rules will be applied outside of the specified
+///   screen width points. First value defines what will happen above maximum, the second one - below minimum.
+///   If only the first value is specified, then the second value will be equal to the first
+///   Possible values: none, keep-value (default), keep-interpolation
+/// @returns A set of properties and media queries to achieve certain values in certain screen widths.
+/// @example
+///   @include linear-interpolation(1440px 834px, (
+///       "font-size": $font-size-medium 19px,
+///       "line-height": 51px 34px
+///   ));
+@mixin adaptivity($screen-widths-list, $properties-map, $outside-screen-widths: keep-value) {
+	$outside-maximum: keep-value;
+	$outside-minimum: keep-value;
+
+	@if length($outside-screen-widths) < 1 {
+		@warn 'No values are specified for the $outside-screen-widths list. Keeping default.';
+	} @else {
+		@if length($outside-screen-widths) > 2 {
+			@warn 'No need to specifiy more than 2 values for the $outside-screen-widths list.';
+		}
+		$outside-maximum: nth($outside-screen-widths, 1);
+		$outside-minimum: if(length($outside-screen-widths) >= 2, nth($outside-screen-widths, 2), $outside-maximum);
+	}
+
+	@if $outside-maximum == keep-value {
+		$media-min-width: nth($screen-widths-list, 1) + 1;
+		@media (min-width: $media-min-width) {
+			@each $property-name, $property-map in $properties-map {
+				#{$property-name}: nth($property-map, 1);
+			}
+		}
+	}
+
+	$iterations: length($screen-widths-list) - 1;
+	@for $i from 1 through $iterations {
+		$media-max-width: nth($screen-widths-list, $i);
+		$media-min-width: if(length($screen-widths-list) >= $i + 1, nth($screen-widths-list, $i + 1), 0);
+		$media: "";
+
+		@if $i != 1 or $outside-maximum != keep-interpolation {
+			$media: $media + "(max-width: #{$media-max-width})";
+		}
+		@if $i != $iterations or $outside-minimum != keep-interpolation {
+			@if $media != "" {
+				$media: $media + " and ";
+			}
+			$media: $media + "(min-width: #{$media-min-width})";
+		}
+		@if $media == "" {
+			$media: "all";
+		}
+
+		@media #{$media} {
+			@each $property-name, $property-map in $properties-map {
+				@if length($property-map) == 1 {
+					#{$property-name}: nth($property-map, 1);
+				} @else {
+					$index_1: min(length($property-map), $i);
+					$index_2: min(length($property-map), $i + 1);
+					#{$property-name}: l.linear-interpolation(($media-max-width: nth($property-map, $index_1), $media-min-width: nth($property-map, $index_2)));
+				}
+			}
+		}
+	}
+
+	@if $outside-minimum == keep-value {
+		$media-max-width: nth($screen-widths-list, length($screen-widths-list)) - 1;
+		@media (max-width: $media-max-width) {
+			@each $property-name, $property-map in $properties-map {
+				@if length($property-map) == 1 {
+					#{$property-name}: nth($property-map, 1);
+				} @else {
+					$index: min(length($property-map), length($screen-widths-list));
+					#{$property-name}: nth($property-map, $index);
+				}
+			}
+		}
+	}
+}

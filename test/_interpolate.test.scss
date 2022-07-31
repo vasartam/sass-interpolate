@@ -1,0 +1,13 @@
+@use "../node_modules/sass-true/sass/true";
+@use "../src/interpolate" as *;
+
+@include true.describe("[mixin] interpolate") {
+	@include true.it("Does something") {
+		@include true.assert {
+			@include true.output {
+			}
+			@include true.expect {
+			}
+		}
+	}
+}
