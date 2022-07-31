@@ -1,0 +1,33 @@
+{
+  "name": "sass-interpolate",
+  "version": "0.1.0",
+  "description": "Interpolate a CSS property on different screen dimensions",
+  "main": "_index.scss",
+  "scripts": {
+    "test": "jest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:vasartam/sass-flex-gap.git"
+  },
+  "keywords": [
+    "sass",
+    "interpolate",
+    "linear",
+    "interpolation",
+    "typography",
+    "media"
+  ],
+  "author": "Vasiliy Artamonov",
+  "license": "GPL-3.0-or-later",
+  "bugs": {
+    "url": "https://github.com/vasartam/sass-interpolate/issues"
+  },
+  "homepage": "https://github.com/vasartam/sass-interpolate#readme",
+  "devDependencies": {
+    "glob": "^8.0.3",
+    "jest": "^28.1.3",
+    "sass": "^1.54.0",
+    "sass-true": "^6.1.0"
+  }
+}
