@@ -1,10 +1,21 @@
 @use "../node_modules/sass-true/sass/true";
+@use "../src/interpolate-old" as *;
 @use "../src/interpolate" as *;
 
 @include true.describe("[mixin] interpolate") {
 	@include true.it("Does something") {
 		@include true.assert {
 			@include true.output {
+				@include interpolate((
+					font-size: (
+						375px: 24px,
+						1440px: 32px,
+					),
+					line-height: (
+						375px: 34px,
+						1440px: 52px,
+					),
+				));
 			}
 			@include true.expect {
 			}

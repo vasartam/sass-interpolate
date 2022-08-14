@@ -1,0 +1,69 @@
+@use "sass:list";
+@use "sass:map";
+@use "../node_modules/sass-true/sass/true";
+@use "../src/linear-interpolation" as *;
+
+@include true.describe("[function] linear-interpolation") {
+	@include true.it("Outputs correct data structure") {
+		$interpolation: linear-interpolation((1px: 0, 2px: 0));
+
+		@include true.assert-true(
+			map.has-key($interpolation, slope),
+			"Should contain \"slope\" key",
+		);
+
+		@include true.assert-true(
+			map.has-key($interpolation, intercept),
+			"Should contain \"intercept\" key",
+		);
+
+		@include true.assert-equal(
+			list.length(map.keys($interpolation)),
+			2,
+			"Should not contain other keys",
+		);
+	}
+
+	@include true.it("Correctly counts slope and intercept") {
+		@include true.assert-equal(
+			linear-interpolation((100: 10, 200: 20)),
+			(
+				slope: 0.1,
+				intercept: 0,
+			),
+			'Should accept unitless values and output unitless intercept accordingly',
+		);
+
+		@include true.assert-equal(
+			linear-interpolation((100px: 10px, 200px: 20px)),
+			(
+				slope: 0.1,
+				intercept: 0px,
+			),
+			'The intercept should be zero',
+		);
+
+		@include true.assert-equal(
+			linear-interpolation((100px: 10px, 200px: 15px)),
+			(
+				slope: 0.05,
+				intercept: 5px,
+			),
+			'The intercept should be positive'
+		);
+
+		@include true.assert-equal(
+			linear-interpolation((100px: 10px, 200px: 25px)),
+			(
+				slope: 0.15,
+				intercept: -5px,
+			),
+			'The intercept should be negative'
+		);
+	}
+}
+
+@include true.describe("[function] linear-equation-to-calc") {
+	@include true.it("Does something") {
+	}
+}

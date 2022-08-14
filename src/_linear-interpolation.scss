@@ -2,6 +2,7 @@
 @use "sass:map";
 @use "sass:math";
 @use "sass:meta";
+@use "strip-unit" as s;
 
 /// linear-interpolation
 /// Calculate the definition of a line between two points
@@ -16,77 +17,34 @@
 /// Modified by Vasiliy Artamonov 06.09.2020
 @function linear-interpolation($map) {
 	$keys: map.keys($map);
+
 	@if (list.length($keys) != 2) {
 		@error "linear-interpolation() $map must be exactly 2 values";
 	}
 
-	$value_1: map.get($map, list.nth($keys, 1));
-	$value_2: map.get($map, list.nth($keys, 2));
+	$value-1: map.get($map, list.nth($keys, 1));
+	$value-2: map.get($map, list.nth($keys, 2));
 	$result: ();
 
-	@if meta.type_of($value_1) == "list" and meta.type_of($value_2) == "list" {
-		$leave_alone_properties: ();
-		$leave_alone_indices: ();
+	// The slope
+	$slope: s.strip-unit(math.div($value-2 - $value-1, list.nth($keys, 2) - list.nth($keys,1)));
 
-		@for $i from 1 through list.length($value_1) {
-			$list_1_item: list.nth($value_1, $i);
-			$list_2_item: list.nth($value_2, $i);
+	// The y-intercept
+	$intercept: $value-1 - $slope * list.nth($keys, 1);
 
-			@if $list_1_item == $list_2_item {
-				$leave_alone_properties: list.append($leave_alone_properties, $list_1_item);
-				$leave_alone_indices: list.append($leave_alone_indices, $i);
-			}
-		}
+	@return (
+		slope: $slope,
+		intercept: $intercept,
+	);
+}
 
-		//@debug $leave_alone_properties;
-		//@debug $leave_alone_indices;
-		//@debug $leave_alone_properties, 1;
-		//@error '';
-		$j: 1;
+@function linear-equation-to-calc($equation) {
+	$slope: map.get($equation, slope);
+	$intercept: map.get($equation, intercept);
 
-		@for $i from 1 through list.length($value_1) {
-			@if list.index($leave_alone_indices, $i) != null and $leave_alone_indices != $i {
-				//@debug 'Skipping index: ', $i;
-				$result: list.append($result, #{list.nth($leave_alone_properties, $j)});
-				$j: $j + 1;
-			} @else {
-				$list_1_item: list.nth($value_1, $i);
-				$list_2_item: list.nth($value_2, $i);
-
-				// The slope
-				$m: math.div($list_2_item - $list_1_item, list.nth($keys, 2) - list.nth($keys, 1));
-
-				// The y-intercept
-				$b: $list_1_item - $m * list.nth($keys, 1);
-
-				// Determine if the sign should be positive or negative
-				$sign: "+";
-				@if ($b < 0) {
-					$sign: "-";
-					$b: math.abs($b);
-				}
-
-				$calc: #{$m*100}vw #{$sign} #{$b};
-				$result: list.append($result, calc(#{$calc}));
-			}
-		}
-	} @else {
-		// The slope
-		$m: math.div($value_2 - $value_1, list.nth($keys, 2) - list.nth($keys,1));
-
-		// The y-intercept
-		$b: $value_1 - $m * list.nth($keys, 1);
-
-		// Determine if the sign should be positive or negative
-		$sign: "+";
-		@if ($b < 0) {
-			$sign: "-";
-			$b: math.abs($b);
-		}
-
-		$calc: #{$m*100}vw #{$sign} #{$b};
-		$result: calc(#{$calc});
-	}
+	$calc: #{$slope*100}vw #{$intercept};
+	$result: calc(#{$calc});
 
 	@return $result;
 }
+

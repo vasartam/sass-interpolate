@@ -1,0 +1,42 @@
+@use "../node_modules/sass-true/sass/true";
+@use "../src/strip-unit" as *;
+
+@include true.describe("[function] strip-unit") {
+	@include true.it("Returns a number without units") {
+		@include true.assert-equal(
+			strip-unit(0),
+			0,
+			"Should work correctly with plain zero",
+		);
+
+		@include true.assert-equal(
+			strip-unit(5),
+			5,
+			"Should work correctly with a number without units",
+		);
+
+		@include true.assert-equal(
+			strip-unit(12px),
+			12,
+			"Should strip `px` units",
+		);
+
+		@include true.assert-equal(
+			strip-unit(2em),
+			2,
+			"Should strip `em` units",
+		);
+
+		@include true.assert-equal(
+			strip-unit(3rem),
+			3,
+			"Should strip `rem` units",
+		);
+
+		@include true.assert-equal(
+			strip-unit(1.25px),
+			1.25,
+			"Should strip units from a floating-point number",
+		);
+	}
+}
