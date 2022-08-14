@@ -1,6 +1,6 @@
 {
   "name": "sass-interpolate",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Interpolate a CSS property on different screen dimensions",
   "main": "_index.scss",
   "scripts": {
